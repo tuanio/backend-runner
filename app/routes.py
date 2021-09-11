@@ -34,12 +34,14 @@ def login():
     return jsonify(
       msg="Sai tài khoản hoặc mật khẩu!",
       code=0,
-      data=[]
+      data=dict()
       ), 401
 
   # Generate access token then return to client-side
   access_token = create_access_token(
-    identity=username,
+    identity=dict(
+      user_id=user.id
+    ),
     expires_delta=timedelta(hours=app.config['JWT_ACCESS_TOKEN_EXPIRES'])
   )
   return jsonify(
@@ -54,7 +56,12 @@ def login():
 @jwt_required()
 def auth():
   current_user = get_jwt_identity()
-  return jsonify(logged_in_as=current_user), 200
+  print(current_user)
+  return jsonify(
+    msg="Tài khoản hiện tại",
+    logged_in_as=current_user,
+    code=1,
+    ), 200
 
 
 # Update hightscore
