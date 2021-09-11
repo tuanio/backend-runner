@@ -1,8 +1,8 @@
 from app import app, db
-from app.models import User
+from app.models import User, Score
 from app.utils import make_response
 from datetime import timedelta
-from flask import request, jsonify
+from flask import request
 import json
 
 from flask_jwt_extended import (
@@ -15,12 +15,11 @@ from flask_jwt_extended import (
 # Homepage
 @app.route('/', methods=['GET'])
 def index():
-    return make_response(
-        method='POST',
-        msg='Welcome to Coronavirus Runner!',
-        code=1,
-        data=dict()
-    ), 200
+    return make_response(dict(
+      msg='Welcome to Coronavirus Runner!',
+      code=1,
+      data=dict()
+    ))
 
 
 # Register
@@ -39,30 +38,37 @@ def register():
     user = User.query.filter_by(username=username).one_or_none()
 
     if not user:
-        new_user = User(
-            username=username,
-            password=password,
-            gender=gender,
-            course=course,
-            is_super=is_super
-        )
+      new_user = User(
+          username=username,
+          password=password,
+          gender=gender,
+          course=course,
+          is_super=is_super
+      )
 
-        db.session.add(new_user)
-        db.session.commit()
+      db.session.add(new_user)
+      db.session.commit()
 
-        return make_response(
-            method='POST',
-            msg='Tạo tài khoản thành công!',
-            code=1,
-            data=dict()
-        ), 201
+      new_score_record = Score(
+        user_id=new_user.id,
+        max_score=0,
+        tried=0
+      )
 
-    return make_response(
-        method='POST',
-        msg='Tài khoản đã tồn tại!',
-        code=0,
+      db.session.add(new_score_record)
+      db.session.commit()
+
+      return make_response(dict(
+        msg='Tạo tài khoản thành công!',
+        code=1,
         data=dict()
-    ), 409
+      ))
+
+    return make_response(dict(
+      msg='Tài khoản đã tồn tại!',
+      code=0,
+      data=dict()
+    ))
 
 
 # Login
@@ -76,12 +82,11 @@ def login():
     user = User.query.filter_by(username=username).one_or_none()
     # Need to check username and passowrd before
     if not user or not user.check_password(password):
-        return make_response(
-            dict(
-                msg="Sai tài khoản hoặc mật khẩu!",
-                code=0,
-                data=dict()
-            ))
+      return make_response(dict(
+        msg="Sai tài khoản hoặc mật khẩu!",
+        code=0,
+        data=dict()
+      ))
 
     # Generate access token then return to client-side
     access_token = create_access_token(
@@ -90,13 +95,11 @@ def login():
         ),
         expires_delta=timedelta(hours=app.config['JWT_ACCESS_TOKEN_EXPIRES'])
     )
-    print(username, password)
-    return make_response(
-        dict(
-            msg='Đăng nhập thành công!',
-            code=1,
-            data=dict(access_token=access_token)
-        ))
+    return make_response(dict(
+      msg='Đăng nhập thành công!',
+      code=1,
+      data=dict(access_token=access_token)
+    ))
 
 
 # Test access token route
@@ -104,12 +107,11 @@ def login():
 @jwt_required()
 def auth():
     current_user = get_jwt_identity()
-    return make_response(
-        method='POST',
-        msg="Tài khoản hiện tại",
-        code=1,
-        data=dict(current_user=current_user)
-    ), 200
+    return make_response(dict(
+      msg="Tài khoản hiện tại",
+      code=1,
+      data=dict(current_user=current_user)
+    ))
 
 
 # Update hightscore
