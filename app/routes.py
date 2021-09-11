@@ -1,4 +1,4 @@
-from app import app
+from app import app, db
 from app.models import User
 from datetime import timedelta
 from flask import make_response, jsonify, request
@@ -17,8 +17,40 @@ def index():
 
 
 # Register
+@app.route('/register', methods=['POST'])
+def register():
+  username = request.json.get('username', None)
+  password = request.json.get('password', None)
+  gender = request.json.get('gender', None)
+  course = request.json.get('course', None)
+  
+  # Mặc định là tài khoản thường
+  is_super = False
 
+  # Nếu user là None có nghĩa là chưa có trong db, cho phép tạo mới
+  user = User.query.filter_by(username=username).one_or_none()
 
+  if not user:
+    new_user = User(
+      username=username,
+      password=password,
+      gender=gender,
+      course=course,
+      is_super=is_super
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify(
+      msg='Tạo tài khoản thành công!',
+      code=1,
+    ), 201
+  
+  return jsonify(
+    msg='Tài khoản đã tồn tại!',
+    code=0
+  ), 409
 
 
 # Login

@@ -6,7 +6,13 @@ gender = False
 course = 'k15'
 is_super = True
 
-user = User(username, password, gender, course, is_super)
+new_user = User(
+    username=username,
+    password=password,
+    gender=gender,
+    course=course,
+    is_super=is_super
+)
 
-db.session.add(user)
+db.session.add(new_user)
 db.session.commit()
