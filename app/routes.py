@@ -1,7 +1,8 @@
 from app import app, db
 from app.models import User
+from app.utils import make_response
 from datetime import timedelta
-from flask import make_response, jsonify, request
+from flask import request
 
 from flask_jwt_extended import (
   create_access_token,
@@ -13,7 +14,12 @@ from flask_jwt_extended import (
 # Homepage
 @app.route('/', methods=['GET'])
 def index():
-  return jsonify(msg='Welcome to Coronavirus Runner!'), 200
+  return make_response(
+    method='POST',
+    msg='Welcome to Coronavirus Runner!',
+    code=1,
+    data=dict()
+  ), 200
 
 
 # Register
@@ -42,14 +48,18 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     
-    return jsonify(
+    return make_response(
+      method='POST',
       msg='Tạo tài khoản thành công!',
       code=1,
+      data=dict()
     ), 201
   
-  return jsonify(
+  return make_response(
+    method='POST',
     msg='Tài khoản đã tồn tại!',
-    code=0
+    code=0,
+    data=dict()
   ), 409
 
 
@@ -63,11 +73,13 @@ def login():
 
   # Need to check username and passowrd before
   if not user or not user.check_password(password):
-    return jsonify(
+    return make_response(
+      method='POST',
       msg="Sai tài khoản hoặc mật khẩu!",
       code=0,
       data=dict()
-      ), 401
+    ), 401
+
 
   # Generate access token then return to client-side
   access_token = create_access_token(
@@ -76,7 +88,8 @@ def login():
     ),
     expires_delta=timedelta(hours=app.config['JWT_ACCESS_TOKEN_EXPIRES'])
   )
-  return jsonify(
+  return make_response(
+    method='POST',
     msg='Đăng nhập thành công!',
     code=1,
     data=dict(access_token=access_token)
@@ -88,11 +101,11 @@ def login():
 @jwt_required()
 def auth():
   current_user = get_jwt_identity()
-  print(current_user)
-  return jsonify(
+  return make_response(
+    method='POST',
     msg="Tài khoản hiện tại",
-    logged_in_as=current_user,
     code=1,
+    data=dict(current_user=current_user)
     ), 200
 
 
@@ -100,4 +113,9 @@ def auth():
 @app.route('/update-highscore/<int:score>')
 def update_highscore(score: int):
   print('User score is:', score)
-  return make_response(jsonify({'ok': 'ok'}))
+  return make_response(
+    method='POST',
+    mgs='ok',
+    code=1,
+    data=dict()
+  ), 200
