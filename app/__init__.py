@@ -15,7 +15,7 @@ app.config['TIME_TO_DIE'] = 30
 
 # local postgresql config database
 username = 'postgres'
-password = 'trung@2001'
+password = 'trung2001'
 db_name = 'backend_runner'
 host = 'localhost'
 port = '5432'
