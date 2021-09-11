@@ -15,7 +15,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 24
 
 # local postgresql config database
 username = 'postgres'
-password = 'trung2001'
+password = 'Tuan1211'
 db_name = 'backend_runner'
 host = 'localhost'
 port = '5432'
