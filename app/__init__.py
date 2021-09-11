@@ -10,8 +10,8 @@ jwt = JWTManager(app)
 # Secret key for jwt, need to be kept confidential
 app.config['SECRET_KEY'] = 'b61bbf5093e943859dcc1bbd17f1d5f0'
 
-# Number of minutes for access token exp
-app.config['TIME_TO_DIE'] = 30
+# Number of hours for access token exp
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 24
 
 # local postgresql config database
 username = 'postgres'
