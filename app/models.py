@@ -11,6 +11,7 @@ class User(db.Model):
     is_super = db.Column(db.Boolean, default=False)
 
 
+
 class Token(db.Model):
     __tablename__ = 'token'
     id = db.Column(db.Integer, primary_key=True)
