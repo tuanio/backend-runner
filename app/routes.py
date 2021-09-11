@@ -2,7 +2,7 @@ from app import app, db
 from app.models import User
 from app.utils import make_response
 from datetime import timedelta
-from flask import request
+from flask import request, jsonify
 import json
 
 from flask_jwt_extended import (
@@ -67,17 +67,20 @@ def register():
 # Login
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
+    request_data = json.loads(request.data)
+    username = request_data.get('username', None)
+    password = request_data.get('password', None)
 
+    # Nếu user là None có nghĩa là chưa có trong db, cho phép tạo mới
+    user = User.query.filter_by(username=username).one_or_none()
     # Need to check username and passowrd before
     if not user or not user.check_password(password):
         return make_response(
-            method='POST',
-            msg="Sai tài khoản hoặc mật khẩu!",
-            code=0,
-            data=dict()
-        ), 401
+            dict(
+                msg="Sai tài khoản hoặc mật khẩu!",
+                code=0,
+                data=dict()
+            ))
 
     # Generate access token then return to client-side
     access_token = create_access_token(
@@ -86,12 +89,13 @@ def login():
         ),
         expires_delta=timedelta(hours=app.config['JWT_ACCESS_TOKEN_EXPIRES'])
     )
+    print(username, password)
     return make_response(
-        method='POST',
-        msg='Đăng nhập thành công!',
-        code=1,
-        data=dict(access_token=access_token)
-    ), 200
+        dict(
+            msg='Đăng nhập thành công!',
+            code=1,
+            data=dict(access_token=access_token)
+        ))
 
 
 # Test access token route
@@ -108,13 +112,8 @@ def auth():
 
 
 # Update hightscore
-@app.route('/update-highscore', methods=['PUT'])
+@app.route('/update-highscore/<int:score>', methods=['GET'])
 @jwt_required()
 def update_highscore(score: int):
-    print('User score is:', score)
-    return make_response(
-        method='POST',
-        mgs='ok',
-        code=1,
-        data=dict()
-    ), 200
+    print('Your score: ', score)
+    return make_response(dict(mgs='ok', code=1, score=score))
