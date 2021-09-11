@@ -26,10 +26,11 @@ def index():
 # Register
 @app.route('/register', methods=['POST'])
 def register():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    gender = request.json.get('gender', None)
-    course = request.json.get('course', None)
+    request_data = json.loads(request.data)
+    username = request_data.get('username', None)
+    password = request_data.get('password', None)
+    gender = request_data.get('gender', None)
+    course = request_data.get('course', None)
 
     # Mặc định là tài khoản thường
     is_super = False
