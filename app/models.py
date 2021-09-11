@@ -1,32 +1,40 @@
+from flask.helpers import send_file
 from app import db
-
 
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
-    # đây là option [other, k13, k14, k15, k16, k17]
+    # False là giới tính Nam, True là giới tính Nữ
+    gender = db.Column(db.Boolean, default=False, server_default="false")
+    # Đây là option [other, k13, k14, k15, k16, k17]
     course = db.Column(db.String(10), default="other")
-    is_super = db.Column(db.Boolean, default=False)
+    is_super = db.Column(db.Boolean, default=False, server_default="false")
+    
 
     def __init__(
         self,
         username,
         password,
+        gender=False,
         course="other",
         is_super=False
     ):
-        self.username=username,
-        self.password=password,
-        self.course=course,
+        self.username=username
+        self.password=password
+        self.gender=gender
+        self.course=course
         self.is_super=is_super
 
+    def check_password(self, password):
+        return self.password == password
 
     def __repr__(self):
-        return '<User({}, {}, {}, {})>'.format(
+        return '<User({}, {}, {}, {}, {})>'.format(
             self.username,
             self.password,
+            self.gender,
             self.course,
             self.is_super
         )
@@ -42,15 +50,15 @@ class Score(db.Model):
         self,
         user_id,
         max_score=0,
-        tried=0,
+        tried=0
     ):
-        self.max_score=max_score,
-        self.tried=tried,
         self.user_id=user_id
+        self.max_score=max_score
+        self.tried=tried
 
 
     def __repr__(self):
-        return '<User({}, {}, {}, {})>'.format(
+        return '<Score({}, {}, {})>'.format(
             self.user_id,
             self.max_score,
             self.tried
