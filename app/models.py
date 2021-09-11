@@ -7,7 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
     # đây là option [other, k13, k14, k15, k16, k17]
-    course = db.String(db.String(10), default="other")
+    course = db.Column(db.String(10), default="other")
     is_super = db.Column(db.Boolean, default=False)
 
     def __init__(
