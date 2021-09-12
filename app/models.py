@@ -63,3 +63,29 @@ class Score(db.Model):
             self.max_score,
             self.tried
         )
+
+
+class AllScore(db.Model):
+    __tablename__ = 'allscore'
+    id = db.Column(db.Integer, primary_key=True)
+    score = db.Column(db.Integer, default=0)
+    tried_in = db.Column(db.Integer, default=0)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(
+        self,
+        user_id,
+        score=0,
+        tried_in=0
+    ):
+        self.user_id=user_id
+        self.score=score
+        self.tried_in=tried_in
+
+
+    def __repr__(self):
+        return '<Score({}, {}, {})>'.format(
+            self.user_id,
+            self.score,
+            self.tried_in
+        )

@@ -1,4 +1,4 @@
-from app import db, User
+from app import db, User, Score
 
 username = 'trungio'
 password = 'trung2001'
@@ -13,6 +13,13 @@ new_user = User(
     course=course,
     is_super=is_super
 )
-
 db.session.add(new_user)
+db.session.commit()
+
+score = Score(
+    user_id=new_user.id,
+    max_score=0,
+    tried=0
+)
+db.session.add(score)
 db.session.commit()

@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "*"}})
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Setup the Flask-JWT-Extended extension
 jwt = JWTManager(app)
@@ -22,8 +23,8 @@ db_name = 'backend_runner'
 host = 'localhost'
 port = '5432'
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{username}:{password}@{host}:{port}/{db_name}'
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://znziadfh:0H5m5AzMvc2vZ-vsum10lnBJQyWMWOJ8@chunee.db.elephantsql.com/znziadfh"
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{username}:{password}@{host}:{port}/{db_name}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://znziadfh:0H5m5AzMvc2vZ-vsum10lnBJQyWMWOJ8@chunee.db.elephantsql.com/znziadfh"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 

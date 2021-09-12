@@ -1,6 +1,6 @@
 from flask import jsonify
 
-frontend_url = 'http://localhost:5500'
+frontend_url = 'http://127.0.0.1:5500'
 
 def make_response(data={}, status=200):
     '''
@@ -9,6 +9,7 @@ def make_response(data={}, status=200):
     '''
     res = jsonify(data)
     res.headers.add('Access-Control-Allow-Origin', frontend_url)
+    res.headers.add('Vary', 'Origin')
     res.headers.add('Content-Type', 'application/json')
     res.headers.add('Accept', 'application/json')
     res.headers.add('Access-Control-Allow-Credentials', 'true')

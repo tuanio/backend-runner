@@ -1,8 +1,9 @@
 from app import app, db
-from app.models import User
+from app.models import User, Score, AllScore
 from app.utils import make_response
 from datetime import timedelta
 from flask import request, jsonify
+from flask_cors import cross_origin
 import json
 
 from flask_jwt_extended import (
@@ -86,16 +87,19 @@ def login():
     # Generate access token then return to client-side
     access_token = create_access_token(
         identity=dict(
-            user_id=user.id
+            user_id=user.id,
+            username=username
         ),
         expires_delta=timedelta(hours=app.config['JWT_ACCESS_TOKEN_EXPIRES'])
     )
-    print(username, password)
     return make_response(
         dict(
             msg='Đăng nhập thành công!',
             code=1,
-            data=dict(access_token=access_token)
+            data=dict(
+                access_token=access_token,
+                user_name=user.name 
+            )
         ))
 
 
@@ -103,18 +107,61 @@ def login():
 @app.route('/auth', methods=['GET'])
 @jwt_required()
 def auth():
-    current_user = get_jwt_identity()
+    user_id = get_jwt_identity()
     return make_response(
-        method='POST',
-        msg="Tài khoản hiện tại",
-        code=1,
-        data=dict(current_user=current_user)
-    ), 200
+        dict(
+            msg="Tài khoản hiện tại",
+            code=1,
+            data=dict(user_id=user_id)
+        ))
 
 
 # Update hightscore
-@app.route('/update-highscore/<int:score>', methods=['GET'])
+@app.route('/update-highscore/<int:user_score>', methods=['GET'])
 @jwt_required()
-def update_highscore(score: int):
-    print('Your score: ', score)
-    return make_response(dict(mgs='ok', code=1, score=score))
+def update_highscore(user_score: int):
+    user_id = get_jwt_identity().get('user_id', None)
+    score = Score.query.filter_by(user_id=user_id).one_or_none()
+    all_score = AllScore(user_id=user_id).one_or_none()
+    if not score:
+        return make_response(
+            dict(
+                msg="Không tồn tại user",
+                code=0
+            )
+        )
+    score.max_score = max(score.max_score, user_score)
+    score.tried += 1
+    db.session.commit()
+    return make_response(
+        dict(
+            msg='ok',
+            code=1,
+            data=dict(
+                user_score=user_score
+            )
+        )
+    )
+
+
+@app.route('/get-highscore', methods=['GET'])
+@jwt_required()
+def get_highscore():
+    user_id = get_jwt_identity().get('user_id', None)
+    score = Score.query.filter_by(user_id=user_id).one_or_none()
+    if not score:
+        return make_response(
+            dict(
+                msg="Không tồn tại user",
+                code=0
+            )
+        )
+    return make_response(
+        dict(
+            code=1,
+            msg="Trả về điểm của user thành công",
+            data=dict(
+                score=score.max_score
+            )
+        )
+    )
