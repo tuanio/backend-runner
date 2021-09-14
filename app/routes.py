@@ -302,8 +302,7 @@ def get_leaderboard():
         Score.max_score,
     ).all()
 
-    data = [dict(id=idx, username=datum[0], gender=datum[1], score=datum[2]) for idx, datum in enumerate(leaderboard)]
-
+    data = { f'{idx}': dict(username=datum[0], gender=datum[1], score=datum[2]) for idx, datum in enumerate(leaderboard) } 
     return jsonify(
         dict(
             code=1,
