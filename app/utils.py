@@ -1,6 +1,6 @@
 from flask import jsonify
 
-frontend_url = 'https://tuanio.github.io/t-rex-corona-pose-control'
+frontend_url = 'https://corona-runner.vercel.app'
 
 def make_response(data={}, status=200):
     '''
