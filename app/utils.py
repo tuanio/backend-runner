@@ -1,6 +1,6 @@
 from flask import jsonify
 
-frontend_url = 'http://127.0.0.1:5500'
+frontend_url = 'http://127.0.0.1:5501'
 
 def make_response(data={}, status=200):
     '''
