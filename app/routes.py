@@ -42,6 +42,7 @@ def register():
         new_user = User(
             username=username,
             password=password,
+            disabled=False,
             gender=gender,
             course=course,
             is_super=is_super
