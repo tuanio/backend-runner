@@ -219,3 +219,94 @@ def reset_user_score():
             code=1
         )
     )
+
+
+@app.route('/disable-all-user')
+@jwt_required()
+def disable_all_user():
+    user_id = get_jwt_identity().get('user_id', None)
+    user = User.query.filter_by(id=user_id).one_or_none()
+    if not user:
+        return make_response(
+            dict(
+                msg="Không tồn tại user",
+                code=0
+            )
+        )
+
+    if not user.is_super:
+        return make_response(
+            dict(
+                msg="User không có quyền làm điều này",
+                code=2
+            )
+        )
+    
+    list_scores = Score.query.all()
+    for record in list_scores:
+        record.disabled = True
+
+    db.session.commit()
+    return make_response(
+        dict(
+            msg="Disable hoàn tất",
+            code=1
+        )
+    )
+
+
+@app.route('/enable-all-user')
+@jwt_required()
+def enable_all_user():
+    user_id = get_jwt_identity().get('user_id', None)
+    user = User.query.filter_by(id=user_id).one_or_none()
+    if not user:
+        return make_response(
+            dict(
+                msg="Không tồn tại user",
+                code=0
+            )
+        )
+
+    if not user.is_super:
+        return make_response(
+            dict(
+                msg="User không có quyền làm điều này",
+                code=2
+            )
+        )
+    
+    list_scores = Score.query.all()
+    for record in list_scores:
+        record.disabled = False
+
+    db.session.commit()
+    return make_response(
+        dict(
+            msg="Disable hoàn tất",
+            code=1
+        )
+    )
+
+
+@app.route('/get-leaderboard')
+def get_leaderboard():
+    leaderboard = db.session.query(
+        User, Score
+    ).filter(User.id==Score.user_id).order_by(
+        Score.max_score.desc()
+    ).with_entities(
+        User.username,
+        User.gender,
+        Score.max_score,
+    ).all()
+
+    data = [dict(username=datum[0], gender=datum[1], score=datum[2]) for datum in leaderboard]
+
+    return jsonify(
+        dict(
+            code=1,
+            msg="Trả về leaderboard thành công",
+            data=dict(data=data)
+        )
+    )
