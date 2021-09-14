@@ -4,11 +4,12 @@ from app import db
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False, unique=True)
+    username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
     # False là giới tính Nam, True là giới tính Nữ
     gender = db.Column(db.Boolean, default=False, server_default="false")
     # Đây là option [other, k13, k14, k15, k16, k17]
+    disabled = db.Column(db.Boolean, default=False)
     course = db.Column(db.String(10), default="other")
     is_super = db.Column(db.Boolean, default=False, server_default="false")
     
@@ -17,12 +18,14 @@ class User(db.Model):
         self,
         username,
         password,
+        disabled,
         gender=False,
         course="other",
         is_super=False
     ):
         self.username=username
         self.password=password
+        self.disabled=disabled
         self.gender=gender
         self.course=course
         self.is_super=is_super
@@ -31,9 +34,10 @@ class User(db.Model):
         return self.password == password
 
     def __repr__(self):
-        return '<User({}, {}, {}, {}, {})>'.format(
+        return '<User({}, {}, {}, {}, {}, {})>'.format(
             self.username,
             self.password,
+            self.disabled,
             self.gender,
             self.course,
             self.is_super

@@ -16,10 +16,11 @@ new_user = User(
 db.session.add(new_user)
 db.session.commit()
 
-score = Score(
+new_score_record = Score(
     user_id=new_user.id,
     max_score=0,
     tried=0
 )
-db.session.add(score)
+
+db.session.add(new_score_record)
 db.session.commit()

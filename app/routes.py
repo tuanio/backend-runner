@@ -16,12 +16,11 @@ from flask_jwt_extended import (
 # Homepage
 @app.route('/', methods=['GET'])
 def index():
-    return make_response(
-        method='POST',
+    return make_response(dict(
         msg='Welcome to Coronavirus Runner!',
         code=1,
         data=dict()
-    ), 200
+    ))
 
 
 # Register
@@ -51,19 +50,30 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        new_score_record = Score(
+            user_id=new_user.id,
+            max_score=0,
+            tried=0
+        )
+
+        db.session.add(new_score_record)
+        db.session.commit()
+
         return make_response(
-            method='POST',
-            msg='Tạo tài khoản thành công!',
-            code=1,
-            data=dict()
-        ), 201
+            dict(
+                msg='Tạo tài khoản thành công!',
+                code=1,
+                data=dict()
+            )
+        )
 
     return make_response(
-        method='POST',
-        msg='Tài khoản đã tồn tại!',
-        code=0,
-        data=dict()
-    ), 409
+        dict(
+            msg='Tài khoản đã tồn tại!',
+            code=0,
+            data=dict()
+        )
+    )
 
 
 # Login
@@ -77,12 +87,11 @@ def login():
     user = User.query.filter_by(username=username).one_or_none()
     # Need to check username and passowrd before
     if not user or not user.check_password(password):
-        return make_response(
-            dict(
-                msg="Sai tài khoản hoặc mật khẩu!",
-                code=0,
-                data=dict()
-            ))
+        return make_response(dict(
+            msg="Sai tài khoản hoặc mật khẩu!",
+            code=0,
+            data=dict()
+        ))
 
     # Generate access token then return to client-side
     access_token = create_access_token(
@@ -98,7 +107,7 @@ def login():
             code=1,
             data=dict(
                 access_token=access_token,
-                user_name=user.name 
+                user_name=username
             )
         ))
 
@@ -122,7 +131,6 @@ def auth():
 def update_highscore(user_score: int):
     user_id = get_jwt_identity().get('user_id', None)
     score = Score.query.filter_by(user_id=user_id).one_or_none()
-    all_score = AllScore(user_id=user_id).one_or_none()
     if not score:
         return make_response(
             dict(
@@ -132,6 +140,14 @@ def update_highscore(user_score: int):
         )
     score.max_score = max(score.max_score, user_score)
     score.tried += 1
+
+    new_allscore = AllScore(
+        user_id=user_id,
+        score=user_score,
+        tried_in=score.tried
+    )
+    db.session.add(new_allscore)
+
     db.session.commit()
     return make_response(
         dict(
@@ -163,5 +179,43 @@ def get_highscore():
             data=dict(
                 score=score.max_score
             )
+        )
+    )
+
+
+@app.route('/reset-user-score', methods=['GET'])
+@jwt_required()
+def reset_user_score():
+    '''
+    reset toàn bộ điểm và lần thử của user
+    '''
+    user_id = get_jwt_identity().get('user_id', None)
+    user = User.query.filter_by(id=user_id).one_or_none()
+    if not user:
+        return make_response(
+            dict(
+                msg="Không tồn tại user",
+                code=0
+            )
+        )
+
+    if not user.is_super:
+        return make_response(
+            dict(
+                msg="User không có quyền làm điều này",
+                code=2
+            )
+        )
+
+    list_scores = Score.query.all()
+    for record in list_scores:
+        record.max_score = 0
+        record.tried = 0
+
+    db.session.commit()
+    return make_response(
+        dict(
+            msg="Reset hoàn tất",
+            code=1
         )
     )
