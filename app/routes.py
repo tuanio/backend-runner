@@ -108,7 +108,8 @@ def login():
             code=1,
             data=dict(
                 access_token=access_token,
-                user_name=username
+                user_name=username,
+                is_super=user.is_super
             )
         ))
 
