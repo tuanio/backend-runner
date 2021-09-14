@@ -5,11 +5,13 @@ password = 'trung2001'
 gender = False
 course = 'k15'
 is_super = True
+disabled = False
 
 new_user = User(
     username=username,
     password=password,
     gender=gender,
+    disabled=disabled,
     course=course,
     is_super=is_super
 )

@@ -12,7 +12,6 @@ class User(db.Model):
     disabled = db.Column(db.Boolean, default=False)
     course = db.Column(db.String(10), default="other")
     is_super = db.Column(db.Boolean, default=False, server_default="false")
-    
 
     def __init__(
         self,
