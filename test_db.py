@@ -31,14 +31,14 @@ db.session.commit()
 
 new_score_record1 = Score(
     user_id=new_user1.id,
-    max_score=20,
-    tried=1
+    max_score=0,
+    tried=0
 )
 
 new_score_record2 = Score(
     user_id=new_user2.id,
-    max_score=60,
-    tried=1
+    max_score=0,
+    tried=0
 )
 
 db.session.add(new_score_record1)

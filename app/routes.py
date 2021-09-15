@@ -119,12 +119,23 @@ def login():
 @jwt_required()
 def auth():
     user_id = get_jwt_identity()
+    user = User.query.filter_by(username=username).one_or_none()
+    if not user or not user.check_password(password):
+        return make_response(dict(
+            msg="Sai tài khoản hoặc mật khẩu!",
+            code=0,
+            data=dict()
+        ))
     return make_response(
         dict(
             msg="Tài khoản hiện tại",
             code=1,
-            data=dict(user_id=user_id)
-        ))
+            data=dict(
+                user_id=user_id,
+                user_disabled=user.disabled
+            )
+        )
+    )
 
 
 # Update hightscore
@@ -243,7 +254,7 @@ def disable_all_user():
                 code=2
             )
         )
-    
+
     list_scores = Score.query.all()
     for record in list_scores:
         record.disabled = True
@@ -277,7 +288,7 @@ def enable_all_user():
                 code=2
             )
         )
-    
+
     list_scores = Score.query.all()
     for record in list_scores:
         record.disabled = False
@@ -295,7 +306,7 @@ def enable_all_user():
 def get_leaderboard():
     leaderboard = db.session.query(
         User, Score
-    ).filter(User.id==Score.user_id).order_by(
+    ).filter(User.id == Score.user_id).order_by(
         Score.max_score.desc()
     ).with_entities(
         User.username,
@@ -303,7 +314,8 @@ def get_leaderboard():
         Score.max_score,
     ).all()
 
-    data = { f'{idx}': dict(username=datum[0], gender=datum[1], score=datum[2]) for idx, datum in enumerate(leaderboard) } 
+    data = {f'{idx}': dict(username=datum[0], gender=datum[1], score=datum[2])
+            for idx, datum in enumerate(leaderboard)}
     return jsonify(
         dict(
             code=1,
