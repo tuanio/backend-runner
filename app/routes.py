@@ -118,7 +118,7 @@ def login():
 @app.route('/auth', methods=['GET'])
 @jwt_required()
 def auth():
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity().get('user_id', None)
     user = User.query.filter_by(id=user_id).one_or_none()
     if not user or not user.check_password(password):
         return make_response(dict(
