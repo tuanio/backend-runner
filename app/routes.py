@@ -296,7 +296,7 @@ def enable_all_user():
     db.session.commit()
     return make_response(
         dict(
-            msg="Disable hoàn tất",
+            msg="Enable hoàn tất",
             code=1
         )
     )
