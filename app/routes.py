@@ -119,7 +119,7 @@ def login():
 @jwt_required()
 def auth():
     user_id = get_jwt_identity()
-    user = User.query.filter_by(username=username).one_or_none()
+    user = User.query.filter_by(id=user_id).one_or_none()
     if not user or not user.check_password(password):
         return make_response(dict(
             msg="Sai tài khoản hoặc mật khẩu!",
