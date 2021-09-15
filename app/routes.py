@@ -144,6 +144,7 @@ def auth():
 def update_highscore(user_score: int):
     user_id = get_jwt_identity().get('user_id', None)
     score = Score.query.filter_by(user_id=user_id).one_or_none()
+    user = User.query.filter_by(id=user_id)
     if not score:
         return make_response(
             dict(
@@ -151,17 +152,19 @@ def update_highscore(user_score: int):
                 code=0
             )
         )
-    score.max_score = max(score.max_score, user_score)
-    score.tried += 1
 
-    new_allscore = AllScore(
-        user_id=user_id,
-        score=user_score,
-        tried_in=score.tried
-    )
-    db.session.add(new_allscore)
+    if not user.disable:
+        score.max_score = max(score.max_score, user_score)
+        score.tried += 1
 
-    db.session.commit()
+        new_allscore = AllScore(
+            user_id=user_id,
+            score=user_score,
+            tried_in=score.tried
+        )
+        db.session.add(new_allscore)
+
+        db.session.commit()
     return make_response(
         dict(
             msg='ok',
