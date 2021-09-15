@@ -289,7 +289,7 @@ def enable_all_user():
             )
         )
 
-    list_scores = Score.query.all()
+    list_scores = User.query.all()
     for record in list_scores:
         record.disabled = False
 
