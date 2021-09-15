@@ -120,9 +120,9 @@ def login():
 def auth():
     user_id = get_jwt_identity().get('user_id', None)
     user = User.query.filter_by(id=user_id).one_or_none()
-    if not user or not user.check_password(password):
+    if not user:
         return make_response(dict(
-            msg="Sai tài khoản hoặc mật khẩu!",
+            msg="Không tồn tại tài khoản",
             code=0,
             data=dict()
         ))
