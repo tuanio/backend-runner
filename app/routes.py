@@ -144,7 +144,7 @@ def auth():
 def update_highscore(user_score: int):
     user_id = get_jwt_identity().get('user_id', None)
     score = Score.query.filter_by(user_id=user_id).one_or_none()
-    user = User.query.filter_by(id=user_id)
+    user = User.query.filter_by(id=user_id).one_or_none()
     if not score:
         return make_response(
             dict(
