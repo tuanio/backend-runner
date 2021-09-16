@@ -153,7 +153,7 @@ def update_highscore(user_score: int):
             )
         )
 
-    if not user.disable:
+    if not user.disabled:
         score.max_score = max(score.max_score, user_score)
         score.tried += 1
 
