@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": "https://corona-runner.vercel.app"}})
+CORS(app, resources={r"*": {"origins": "https://corona-runner.vercel.app"}}) # change from '*' to this route 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Setup the Flask-JWT-Extended extension
