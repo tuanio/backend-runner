@@ -131,9 +131,14 @@ def login():
 @app.route('/auth', methods=['GET'])
 @jwt_required()
 def auth():
+    '''
+    kkk
+    '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('kkk', None)
     user = User.query.filter_by(id=user_id).one_or_none()
-    if not user:
+
+    if not user or not user.check_secret_key(secret_key):
         return make_response(dict(
             msg="Không tồn tại tài khoản",
             code=0,
@@ -157,13 +162,18 @@ def auth():
 
 
 # Update hightscore
-@app.route('/update-highscore/<int:user_score>', methods=['GET'])
+@app.route('/uh/<int:user_score>', methods=['GET'])
 @jwt_required()
 def update_highscore(user_score: int):
+    '''
+    update-highscore
+    okdiei
+    '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('okdiei', None)
     score = Score.query.filter_by(user_id=user_id).one_or_none()
     user = User.query.filter_by(id=user_id).one_or_none()
-    if not score:
+    if not score or not user.check_secret_key(secret_key):
         return make_response(
             dict(
                 msg="Không tồn tại user",
@@ -202,9 +212,14 @@ def update_highscore(user_score: int):
 @app.route('/get-highscore', methods=['GET'])
 @jwt_required()
 def get_highscore():
+    '''
+    ktjdk
+    '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('ktjdk', None)
     score = Score.query.filter_by(user_id=user_id).one_or_none()
-    if not score:
+    user = User.query.filter_by(id=user_id).one_or_none()
+    if not score or not user.check_secret_key(secret_key):
         return make_response(
             dict(
                 msg="Không tồn tại user",
@@ -225,15 +240,18 @@ def get_highscore():
     )
 
 
-@app.route('/reset-user-score', methods=['GET'])
+@app.route('/uwu', methods=['GET'])
 @jwt_required()
 def reset_user_score():
     '''
+    reset user score
     reset toàn bộ điểm và lần thử của user
+    uwu
     '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('uwu', None)
     user = User.query.filter_by(id=user_id).one_or_none()
-    if not user:
+    if not user or not user.check_secret_key(secret_key):
         return make_response(
             dict(
                 msg="Không tồn tại user",
@@ -267,12 +285,17 @@ def reset_user_score():
     )
 
 
-@app.route('/disable-all-user')
+@app.route('/owo')
 @jwt_required()
 def disable_all_user():
+    '''
+    disable-all-user
+    owo
+    '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('owo', None)
     user = User.query.filter_by(id=user_id).one_or_none()
-    if not user:
+    if not user or not user.check_secret_key(secret_key):
         return make_response(
             dict(
                 msg="Không tồn tại user",
@@ -304,10 +327,15 @@ def disable_all_user():
     )
 
 
-@app.route('/enable-all-user')
+@app.route('/eau')
 @jwt_required()
 def enable_all_user():
+    '''
+    enable all user
+    eau
+    '''
     user_id = get_jwt_identity().get('user_id', None)
+    secret_key = request.args.get('eau', None)
     user = User.query.filter_by(id=user_id).one_or_none()
     if not user:
         return make_response(
