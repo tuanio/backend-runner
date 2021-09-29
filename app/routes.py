@@ -223,7 +223,8 @@ def get_highscore():
         return make_response(
             dict(
                 msg="Không tồn tại user",
-                code=0
+                code=0,
+                data=dict()
             )
         )
     user.secret_key = gen_secret_key()
