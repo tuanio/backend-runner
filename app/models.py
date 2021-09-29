@@ -37,7 +37,7 @@ class User(db.Model):
         return self.password == password
 
     def check_secret_key(self, secret_key):
-        return self.secret_key == secret_key
+        return not self.secret_key or self.secret_key == secret_key
 
     def __repr__(self):
         return '<User({}, {}, {}, {}, {}, {})>'.format(

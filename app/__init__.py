@@ -24,6 +24,7 @@ host = 'localhost'
 port = '5432'
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{username}:{password}@{host}:{port}/{db_name}'
+
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ntwufnwkupmnjz:b3301f3ff3db213384ab9f48b3012934c4a23ec3ffca09d7874140f05bbc6db6@ec2-44-193-150-214.compute-1.amazonaws.com:5432/ddihuntcjekmfb"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
