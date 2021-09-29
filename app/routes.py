@@ -1,10 +1,12 @@
 from app import app, db
+import string
 from app.models import User, Score, AllScore
 from app.utils import make_response
 from datetime import timedelta
 from flask import request, jsonify
 from flask_cors import cross_origin
 import json
+import random
 
 from flask_jwt_extended import (
     create_access_token,
@@ -12,6 +14,10 @@ from flask_jwt_extended import (
     jwt_required
 )
 
+## asdf = secret key
+
+def gen_secret_key(size: int=16):
+    return ''.join([random.choice(string.ascii_letters) for i in range(size)])
 
 # Homepage
 @app.route('/', methods=['GET'])
@@ -45,7 +51,8 @@ def register():
             disabled=False,
             gender=gender,
             course=course,
-            is_super=is_super
+            is_super=is_super,
+            secret_key=gen_secret_key()
         )
 
         db.session.add(new_user)
@@ -64,7 +71,7 @@ def register():
             dict(
                 msg='Tạo tài khoản thành công!',
                 code=1,
-                data=dict()
+                data=dict(asdf=new_user.secret_key)
             )
         )
 
@@ -86,6 +93,7 @@ def login():
 
     # Nếu user là None có nghĩa là chưa có trong db, cho phép tạo mới
     user = User.query.filter_by(username=username).one_or_none()
+
     # Need to check username and passowrd before
     if not user or not user.check_password(password):
         return make_response(dict(
@@ -93,6 +101,10 @@ def login():
             code=0,
             data=dict()
         ))
+
+    # tao secret key moi
+    user.secret_key = gen_secret_key()
+    db.session.commit()
 
     # Generate access token then return to client-side
     access_token = create_access_token(
@@ -109,7 +121,8 @@ def login():
             data=dict(
                 access_token=access_token,
                 user_name=username,
-                is_super=user.is_super
+                is_super=user.is_super,
+                asdf=user.secret_key
             )
         ))
 
@@ -126,13 +139,18 @@ def auth():
             code=0,
             data=dict()
         ))
+    # tao secret key moi
+    user.secret_key = gen_secret_key()
+    db.session.commit()
+
     return make_response(
         dict(
             msg="Tài khoản hiện tại",
             code=1,
             data=dict(
                 user_id=user_id,
-                user_disabled=user.disabled
+                user_disabled=user.disabled,
+                asdf=user.secret_key
             )
         )
     )
@@ -149,7 +167,8 @@ def update_highscore(user_score: int):
         return make_response(
             dict(
                 msg="Không tồn tại user",
-                code=0
+                code=0,
+                data=dict()
             )
         )
 
@@ -163,14 +182,18 @@ def update_highscore(user_score: int):
             tried_in=score.tried
         )
         db.session.add(new_allscore)
-
         db.session.commit()
+
+    user.secret_key = gen_secret_key()
+    db.session.commit()
+
     return make_response(
         dict(
             msg='ok',
             code=1,
             data=dict(
-                user_score=user_score
+                user_score=user_score,
+                asdf=user.secret_key
             )
         )
     )
@@ -188,12 +211,15 @@ def get_highscore():
                 code=0
             )
         )
+    user.secret_key = gen_secret_key()
+    db.session.commit()
     return make_response(
         dict(
             code=1,
             msg="Trả về điểm của user thành công",
             data=dict(
-                score=score.max_score
+                score=score.max_score,
+                asdf=user.secret_key
             )
         )
     )
@@ -214,12 +240,14 @@ def reset_user_score():
                 code=0
             )
         )
-
+    user.secret_key = gen_secret_key()
+    db.session.commit()
     if not user.is_super:
         return make_response(
             dict(
                 msg="User không có quyền làm điều này",
-                code=2
+                code=2,
+                data=dict(asdf=user.secret_key)
             )
         )
 
@@ -227,12 +255,14 @@ def reset_user_score():
     for record in list_scores:
         record.max_score = 0
         record.tried = 0
-
+    user.secret_key = gen_secret_key()
     db.session.commit()
+
     return make_response(
         dict(
             msg="Reset hoàn tất",
-            code=1
+            code=1,
+            data=dict(asdf=user.secret_key)
         )
     )
 
@@ -249,24 +279,27 @@ def disable_all_user():
                 code=0
             )
         )
-
+    user.secret_key = gen_secret_key()
+    db.session.commit()
     if not user.is_super:
         return make_response(
             dict(
                 msg="User không có quyền làm điều này",
-                code=2
+                code=2,
+                data=dict(asdf=user.secret_key)
             )
         )
 
     list_scores = User.query.all()
     for record in list_scores:
         record.disabled = True
-
+    user.secret_key = gen_secret_key()
     db.session.commit()
     return make_response(
         dict(
             msg="Disable hoàn tất",
-            code=1
+            code=1,
+            data=dict(asdf=user.secret_key)
         )
     )
 
@@ -283,24 +316,27 @@ def enable_all_user():
                 code=0
             )
         )
-
+    user.secret_key = gen_secret_key()
+    db.session.commit()
     if not user.is_super:
         return make_response(
             dict(
                 msg="User không có quyền làm điều này",
-                code=2
+                code=2,
+                data=dict(asdf=user.secret_key)
             )
         )
 
     list_scores = User.query.all()
     for record in list_scores:
         record.disabled = False
-
+    user.secret_key = gen_secret_key()
     db.session.commit()
     return make_response(
         dict(
             msg="Enable hoàn tất",
-            code=1
+            code=1,
+            data=dict(asdf=user.secret_key)
         )
     )
 

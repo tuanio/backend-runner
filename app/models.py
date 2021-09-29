@@ -1,6 +1,7 @@
 from flask.helpers import send_file
 from app import db
 
+
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -12,6 +13,7 @@ class User(db.Model):
     disabled = db.Column(db.Boolean, default=False)
     course = db.Column(db.String(10), default="other")
     is_super = db.Column(db.Boolean, default=False, server_default="false")
+    secret_key = db.Column(db.String(16), default=None)
 
     def __init__(
         self,
@@ -20,17 +22,22 @@ class User(db.Model):
         disabled,
         gender=False,
         course="other",
-        is_super=False
+        is_super=False,
+        secret_key=None
     ):
-        self.username=username
-        self.password=password
-        self.disabled=disabled
-        self.gender=gender
-        self.course=course
-        self.is_super=is_super
+        self.username = username
+        self.password = password
+        self.disabled = disabled
+        self.gender = gender
+        self.course = course
+        self.is_super = is_super
+        self.secret_key = secret_key
 
     def check_password(self, password):
         return self.password == password
+
+    def check_secret_key(self, secret_key):
+        return self.secret_key == secret_key
 
     def __repr__(self):
         return '<User({}, {}, {}, {}, {}, {})>'.format(
@@ -41,6 +48,7 @@ class User(db.Model):
             self.course,
             self.is_super
         )
+
 
 class Score(db.Model):
     __tablename__ = 'score'
@@ -55,10 +63,9 @@ class Score(db.Model):
         max_score=0,
         tried=0
     ):
-        self.user_id=user_id
-        self.max_score=max_score
-        self.tried=tried
-
+        self.user_id = user_id
+        self.max_score = max_score
+        self.tried = tried
 
     def __repr__(self):
         return '<Score({}, {}, {})>'.format(
@@ -81,10 +88,9 @@ class AllScore(db.Model):
         score=0,
         tried_in=0
     ):
-        self.user_id=user_id
-        self.score=score
-        self.tried_in=tried_in
-
+        self.user_id = user_id
+        self.score = score
+        self.tried_in = tried_in
 
     def __repr__(self):
         return '<Score({}, {}, {})>'.format(

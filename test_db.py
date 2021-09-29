@@ -6,6 +6,7 @@ gender = False
 course = 'K15'
 is_super = True
 disabled = False
+secret_key = None
 
 new_user1 = User(
     username=username,
@@ -13,7 +14,8 @@ new_user1 = User(
     gender=gender,
     disabled=disabled,
     course=course,
-    is_super=is_super
+    is_super=is_super,
+    secret_key=secret_key
 )
 
 new_user2 = User(
@@ -22,7 +24,8 @@ new_user2 = User(
     gender=False,
     disabled=False,
     course=course,
-    is_super=is_super
+    is_super=is_super,
+    secret_key=secret_key
 )
 
 db.session.add(new_user1)
